@@ -1,5 +1,5 @@
 import keras.backend as K
-import keras_fcn.backend as K1
+from .backend import tensorflow_backend
 from keras.utils import conv_utils
 from keras.engine.topology import Layer
 from keras.engine import InputSpec
@@ -31,7 +31,7 @@ class BilinearUpSampling2D(Layer):
                     self.target_size[0], self.target_size[1])
 
     def call(self, inputs):
-        return K1.resize_images(inputs, size=self.target_size,
+        return tensorflow_backend.resize_images(inputs, size=self.target_size,
                                 method='bilinear')
 
     def get_config(self):

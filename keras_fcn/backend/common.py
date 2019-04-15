@@ -11,13 +11,12 @@ def load_weights(model, weights_path):
 
     # New file format.
     layer_names = [n.decode('utf8') for n in f.attrs['layer_names']]
-
     # Reverse index of layer name to list of layers with name.
     index = {}
     for layer in model.layers:
         if layer.name:
             index.setdefault(layer.name, []).append(layer)
-
+    
     # We batch weight value assignments in a single backend call
     # which provides a speedup in TensorFlow.
     weight_value_tuples = []
@@ -25,13 +24,14 @@ def load_weights(model, weights_path):
         g = f[name]
         weight_names = [n.decode('utf8') for n in g.attrs['weight_names']]
         weight_values = [g[weight_name] for weight_name in weight_names]
-
+        
         for layer in index.get(name, []):
             symbolic_weights = layer.weights
             # Set values.
             for i in range(len(weight_values)):
                 weight_value_tuples.append((symbolic_weights[i],
                                             weight_values[i]))
+    
+    print('len(weight_value_tuples):',len(weight_value_tuples))
     K.batch_set_value(weight_value_tuples)
-
     return layer_names
